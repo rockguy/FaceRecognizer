@@ -13,13 +13,13 @@ import vinnik.facerecognizer.R;
  * Created by vinnik on 02.03.2017.
  */
 
-public class HomePageFragment extends Fragment {
+public class CameraFragment extends Fragment {
 
-    public static final String TAG = "HomePageFragmentTag";
+    public static final String TAG = "CameraFragmentTag";
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.home_page_fragment,null);
+        return inflater.inflate(R.layout.camera_fragment,null);
     }
 }

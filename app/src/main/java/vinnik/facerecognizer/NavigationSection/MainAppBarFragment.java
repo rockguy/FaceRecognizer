@@ -15,6 +15,8 @@ import vinnik.facerecognizer.R;
 
 public class MainAppBarFragment extends Fragment {
 
+    public static final String TAG = "MainAppBarFragmentTag";
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

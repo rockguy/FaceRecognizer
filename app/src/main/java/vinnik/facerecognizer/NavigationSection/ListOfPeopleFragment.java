@@ -14,6 +14,10 @@ import vinnik.facerecognizer.R;
  */
 
 public class ListOfPeopleFragment extends Fragment {
+
+    public static final String TAG = "ListOfPeopleFragmentTag";
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

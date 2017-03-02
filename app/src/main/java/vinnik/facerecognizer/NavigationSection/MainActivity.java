@@ -1,12 +1,15 @@
 package vinnik.facerecognizer.NavigationSection;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -20,11 +23,22 @@ public class MainActivity extends FragmentActivity
     private ListOfPeopleFragment listOfPeople;
     private FragmentManager manager;
     private FragmentTransaction transaction;
+    private CameraFragment camera;
+    private OpenImageFragment openImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout. activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
         manager = getSupportFragmentManager();
 
@@ -32,13 +46,11 @@ public class MainActivity extends FragmentActivity
         mainAppBar = new MainAppBarFragment();
         homePage = new HomePageFragment();
         listOfPeople = new ListOfPeopleFragment();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        camera = new CameraFragment();
+        openImage = new OpenImageFragment();
 
         transaction = manager.beginTransaction();
         transaction.addToBackStack(null);
-        transaction.add(R.id.app_bar_contaiter,mainAppBar);
         transaction.add(R.id.content_contaiter,homePage);
         transaction.commit();
     }
@@ -77,22 +89,28 @@ public class MainActivity extends FragmentActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         transaction = manager.beginTransaction();
 
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            // Handle the camera action
+            if(manager.getFragments().size()>0) {
+                transaction.replace(R.id.content_contaiter, homePage);
+            }
         } else if (id == R.id.nav_camera) {
-
+            if(manager.getFragments().size()>0) {
+                transaction.replace(R.id.content_contaiter, camera);
+            }
         } else if (id == R.id.nav_gallery) {
-            transaction = manager.beginTransaction();
-            transaction.replace(R.id.content_contaiter ,listOfPeople);
-            transaction.commit();
+            if(manager.getFragments().size()>0) {
+                transaction.replace(R.id.content_contaiter, listOfPeople);
+            }
         } else if (id == R.id.nav_open_image) {
-
+            if(manager.getFragments().size()>0) {
+                transaction.replace(R.id.content_contaiter, openImage);
+            }
         }
 
         transaction.commit();
