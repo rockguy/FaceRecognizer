@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/nav_home_label"
+            android:onClick="onNavigationItemSelected" />
+        <item
+            android:id="@+id/nav_camera"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="@string/nav_camera_label"
+            android:onClick="onNavigationItemSelected" />
+        <item
+            android:id="@+id/nav_gallery"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/nav_gallery_label"
+            android:onClick="onNavigationItemSelected" />
+        <item
+            android:id="@+id/nav_open_image"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/nav_open_image_label" />
+    </group>
+
+</menu>
