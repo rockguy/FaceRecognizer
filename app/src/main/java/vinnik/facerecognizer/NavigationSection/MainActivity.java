@@ -1,5 +1,6 @@
 package vinnik.facerecognizer.NavigationSection;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -130,9 +131,11 @@ public class MainActivity extends FragmentActivity
                 transaction.replace(R.id.content_contaiter, homePage);
             }
         } else if (id == R.id.nav_camera) {
-            if(manager.getFragments().size()>0) {
-                transaction.replace(R.id.content_contaiter, camera);
-            }
+//            if(manager.getFragments().size()>0) {
+//                transaction.replace(R.id.content_contaiter, camera);
+//            }
+            Intent intent = new Intent(MainActivity.this, CameraLayout.class);
+            startActivityForResult(intent, 101);
         } else if (id == R.id.nav_gallery) {
             if(manager.getFragments().size()>0) {
                 transaction.replace(R.id.content_contaiter, listOfPeople);
