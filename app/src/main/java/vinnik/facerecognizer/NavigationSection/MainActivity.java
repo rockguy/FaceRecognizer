@@ -1,5 +1,7 @@
 package vinnik.facerecognizer.NavigationSection;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -13,6 +15,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.io.ByteArrayOutputStream;
+
+import Models.Person;
+import Models.Photo;
+import io.realm.Realm;
 import vinnik.facerecognizer.R;
 
 public class MainActivity extends FragmentActivity
@@ -53,6 +60,29 @@ public class MainActivity extends FragmentActivity
         transaction.addToBackStack(null);
         transaction.add(R.id.content_contaiter,homePage);
         transaction.commit();
+
+        Realm realm = Realm.getDefaultInstance();
+        try {
+            realm.beginTransaction();
+            Person person = realm.createObject(Person.class);
+            person.FirstName = "John";
+            person.LastName = "Doe2";
+            person.City = "Some City";
+            Photo photo = realm.createObject(Photo.class);
+            photo.Owner = person;
+            //
+            Bitmap icon = BitmapFactory.decodeResource(getResources(),
+                    R.drawable.ic_menu_camera);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            icon.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            photo.Face = stream.toByteArray();
+            person.Faces.add(photo);
+            //
+            realm.commitTransaction();
+        } finally {
+            realm.close();
+        }
+
     }
 
     @Override
