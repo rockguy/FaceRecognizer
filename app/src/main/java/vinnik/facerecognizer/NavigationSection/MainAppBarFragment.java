@@ -22,5 +22,4 @@ public class MainAppBarFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.app_bar_main,null);
     }
-
 }

@@ -20,6 +20,12 @@ public class Person extends RealmObject {
 
     @Override
     public String toString() {
-        return FirstName + " " + LastName;
+        if (FirstName.equals("defaultPerson")) return "";
+        else return FirstName + " " + LastName;
+    }
+
+    public byte[] getBestPhoto() {
+        byte[] b = Faces.where().equalTo("IsTheBest", true).findAll().first().Face;
+        return b;
     }
 }

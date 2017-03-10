@@ -1,9 +1,9 @@
 package vinnik.facerecognizer.NavigationSection;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentActivity;
@@ -16,28 +16,43 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.io.ByteArrayOutputStream;
-
+import Migration.MyMigration;
 import Models.Person;
-import Models.Photo;
+import Support.PersonRecognizer;
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import vinnik.facerecognizer.R;
 
 public class MainActivity extends FragmentActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+
+    private int START_SUM_CODE = 1;
+
+    private static FragmentManager manager;
+    private static FragmentTransaction transaction;
+
+    // Declaration  of fragments
     private MainAppBarFragment mainAppBar;
-    private HomePageFragment homePage;
-    private ListOfPeopleFragment listOfPeople;
-    private FragmentManager manager;
-    private FragmentTransaction transaction;
-    private CameraFragment camera;
-    private OpenImageFragment openImage;
+    private static HomePageFragment homePage = new HomePageFragment();
+    private static ListOfPeopleFragment listOfPeople = new ListOfPeopleFragment();
+    private static OpenImageFragment openImage = new OpenImageFragment();
+    private static FaceDetailFragment faceDetail = new FaceDetailFragment();
+    // Declaration of Realm
+    private Realm realm;
+    public static RealmConfiguration realmConfig = new RealmConfiguration.Builder().name("Migration.realm")
+            .schemaVersion(2)
+            .migration(new MyMigration())
+            .build();
+
+
+    public static PersonRecognizer personRecognizer = new PersonRecognizer(Environment.getExternalStorageDirectory() + "/frames/data");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout. activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -48,42 +63,42 @@ public class MainActivity extends FragmentActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        // Initialization of Realm
+        realm = configRealm();
+
+        // Imalementation of fragments
         manager = getSupportFragmentManager();
-
-
         mainAppBar = new MainAppBarFragment();
-        homePage = new HomePageFragment();
-        listOfPeople = new ListOfPeopleFragment();
-        camera = new CameraFragment();
-        openImage = new OpenImageFragment();
 
+        //Open Start Page
         transaction = manager.beginTransaction();
-        transaction.addToBackStack(null);
         transaction.add(R.id.content_contaiter,homePage);
         transaction.commit();
+    }
 
-        Realm realm = Realm.getDefaultInstance();
+    public Realm configRealm() {
+        realm = Realm.getInstance(realmConfig);
+
         try {
             realm.beginTransaction();
-            Person person = realm.createObject(Person.class);
-            person.FirstName = "John";
-            person.LastName = "Doe2";
-            person.City = "Some City";
-            Photo photo = realm.createObject(Photo.class);
-            photo.Owner = person;
-            //
-            Bitmap icon = BitmapFactory.decodeResource(getResources(),
-                    R.drawable.ic_menu_camera);
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            icon.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            photo.Face = stream.toByteArray();
-            person.Faces.add(photo);
-            //
+            realm.delete(Models.Photo.class);
+            realm.delete(Models.Person.class);
             realm.commitTransaction();
         } finally {
             realm.close();
         }
+        return realm;
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == START_SUM_CODE && resultCode == RESULT_OK) {
+            listOfPeople.inputState = ListOfPeopleFragment.InputState.CameraFragment;
+            transaction.addToBackStack(null);
+            transaction = manager.beginTransaction();
+            transaction.replace(R.id.content_contaiter, listOfPeople, listOfPeople.TAG);
+            transaction.commitAllowingStateLoss();
+        }
     }
 
     @Override
@@ -121,34 +136,77 @@ public class MainActivity extends FragmentActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        transaction = manager.beginTransaction();
-
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_home) {
-            if(manager.getFragments().size()>0) {
-                transaction.replace(R.id.content_contaiter, homePage);
-            }
-        } else if (id == R.id.nav_camera) {
-//            if(manager.getFragments().size()>0) {
-//                transaction.replace(R.id.content_contaiter, camera);
-//            }
-            Intent intent = new Intent(MainActivity.this, CameraLayout.class);
-            startActivityForResult(intent, 101);
-        } else if (id == R.id.nav_gallery) {
-            if(manager.getFragments().size()>0) {
-                transaction.replace(R.id.content_contaiter, listOfPeople);
-            }
-        } else if (id == R.id.nav_open_image) {
-            if(manager.getFragments().size()>0) {
-                transaction.replace(R.id.content_contaiter, openImage);
-            }
+        if (id == R.id.nav_camera) {
+            Navigate(ListOfFragments.Camera, ListOfFragments.Home, this);
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
+            return true;
         }
-
-        transaction.commit();
+        switch (id) {
+            case R.id.nav_home:
+                MainActivity.Navigate(ListOfFragments.Home, ListOfFragments.Home, null);
+                break;
+            case R.id.nav_gallery:
+                MainActivity.Navigate(ListOfFragments.ListOfPeople, ListOfFragments.Home, null);
+                break;
+            case R.id.nav_open_image:
+                MainActivity.Navigate(ListOfFragments.OpenImage, ListOfFragments.Home, null);
+                break;
+        }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public static enum ListOfFragments {Camera, Home, ListOfPeople, OpenImage, FaceDetail}
+
+    ;
+
+    public static void Navigate(ListOfFragments finalFragment, ListOfFragments backFragment, Object data) {
+        transaction = manager.beginTransaction();
+        switch (finalFragment) {
+            case Home:
+                if (manager.getFragments().size() > 0) {
+                    transaction.replace(R.id.content_contaiter, homePage);
+                }
+                break;
+            case ListOfPeople:
+                if (manager.getFragments().size() > 0) {
+                    listOfPeople.inputState = ListOfPeopleFragment.InputState.HomeFragment;
+                    if (manager.findFragmentByTag(ListOfPeopleFragment.TAG) != null) {
+                        manager.getFragments().remove(manager.findFragmentByTag(ListOfPeopleFragment.TAG));
+                    }
+                    transaction.replace(R.id.content_contaiter, listOfPeople, ListOfPeopleFragment.TAG);
+                }
+                break;
+            case OpenImage:
+                if (manager.getFragments().size() > 0) {
+                    transaction.replace(R.id.content_contaiter, openImage);
+                }
+                break;
+            case FaceDetail:
+                if (manager.getFragments().size() > 0) {
+                    faceDetail.person = (Person) data;
+                    transaction.replace(R.id.content_contaiter, faceDetail);
+                }
+                break;
+            case Camera:
+                Activity obj = (Activity) data;
+                Intent intent = new Intent((obj).getBaseContext(), CameraLayout.class);
+                (obj).startActivityForResult(intent, 1);
+                break;
+            default:
+                return;
+
+        }
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    public static void BackNavigate() {
+        manager.popBackStack();
     }
 }

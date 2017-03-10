@@ -6,12 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import Models.Person;
-import io.realm.Realm;
-import io.realm.RealmQuery;
 import vinnik.facerecognizer.R;
 
 /**
@@ -30,16 +25,7 @@ public class HomePageFragment extends Fragment {
 
     @Override
     public void onStart() {
-        TextView t = (TextView) getActivity().findViewById(R.id.HelloWorldText);
-        Realm realm = Realm.getDefaultInstance();
-        RealmQuery<Person> query = realm.where(Person.class);
 
-        Person person = realm.where(Person.class).isNotEmpty("Faces").findAll().first();
-        String s = person.toString();
-        ImageView image = (ImageView) getActivity().findViewById(R.id.image);
-        image.setImageBitmap(person.Faces.first().getBitmap());
-
-        t.setText(s);
         super.onStart();
     }
 }

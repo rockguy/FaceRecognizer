@@ -3,9 +3,9 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:text="Здесь будет список людей, чьи лица мы уже имеем"
+    <ListView
+        android:id="@+id/list_of_best_people"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView2" />
+        android:layout_height="wrap_content" />
+
 </LinearLayout>
