@@ -1,6 +1,7 @@
 package Support;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +11,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import Models.Person;
+import Models.NamedPhoto;
 import vinnik.facerecognizer.R;
 
 /**
@@ -19,23 +20,23 @@ import vinnik.facerecognizer.R;
 
 public class MyListOfPersonAdapter extends BaseAdapter {
     Context context;
-    List<Person> data;
     LayoutInflater mInflater;
+    List<NamedPhoto> namedPhotos;
 
-    public MyListOfPersonAdapter(Context context, List<Person> data) {
+    public MyListOfPersonAdapter(Context context, List<NamedPhoto> namedPhotos) {
         this.context = context;
-        this.data = data;
+        this.namedPhotos = namedPhotos;
         mInflater = LayoutInflater.from(context);
     }
 
     @Override
     public int getCount() {
-        return data.size();
+        return namedPhotos.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return data.get(position);
+        return namedPhotos.get(position);
     }
 
     @Override
@@ -51,10 +52,10 @@ public class MyListOfPersonAdapter extends BaseAdapter {
         }
 
         final TextView tv = (TextView) root.findViewById(R.id.best_face_owner);
-        tv.setText(data.get(position).toString());
+        tv.setText(namedPhotos.get(position).name);
 
         final ImageView image = (ImageView) root.findViewById(R.id.best_face_image);
-        image.setImageBitmap(data.get(position).Faces.where().equalTo("IsTheBest", true).findAll().first().getBitmap());
+        image.setImageBitmap(Bitmap.createScaledBitmap(namedPhotos.get(position).bitmap, 120, 120, false));
         return root;
     }
 }

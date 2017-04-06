@@ -1,31 +1,27 @@
 package Models;
 
-import io.realm.RealmList;
-import io.realm.RealmObject;
-import io.realm.annotations.Required;
+import java.io.Serializable;
+
+import Support.HelpClass;
+
 
 /**
  * Created by vinnik on 03.03.2017.
  */
 
-public class Person extends RealmObject {
+public class Person implements Serializable {
     public int Id;
-    @Required
     public String FirstName;
     public String MiddleName;
-    @Required
     public String LastName;
     public String City;
-    public RealmList<Photo> Faces;
+    public String ShortName;
+    public String LocalImageFile;
 
     @Override
     public String toString() {
-        if (FirstName.equals("defaultPerson")) return "";
+        if (HelpClass.isNullOrEmpty(FirstName) || HelpClass.isNullOrEmpty(LastName))
+            return ShortName;
         else return FirstName + " " + LastName;
-    }
-
-    public byte[] getBestPhoto() {
-        byte[] b = Faces.where().equalTo("IsTheBest", true).findAll().first().Face;
-        return b;
     }
 }

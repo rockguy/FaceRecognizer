@@ -1,6 +1,7 @@
 <resources>
     <string name="nav_home_label">На стартовую страницу</string>
-    <string name="nav_camera_label">Открыть камеру</string>
+    <string name="nav_recognize_person_camera_label">Распознать человека</string>
+    <string name="nav_add_person_camera_label">Добавить человека</string>
     <string name="nav_gallery_label">Открыть галерею</string>
     <string name="nav_open_image_label">Открыть изображение</string>
 </resources>

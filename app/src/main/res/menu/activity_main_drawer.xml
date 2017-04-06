@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
         <item
@@ -10,9 +8,14 @@
             android:title="@string/nav_home_label"
             android:onClick="onNavigationItemSelected" />
         <item
-            android:id="@+id/nav_camera"
+            android:id="@+id/nav_add_person_camera"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="@string/nav_camera_label"
+            android:title="@string/nav_add_person_camera_label"
+            android:onClick="onNavigationItemSelected" />
+        <item
+            android:id="@+id/nav_recognize_person_camera"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="@string/nav_recognize_person_camera_label"
             android:onClick="onNavigationItemSelected" />
         <item
             android:id="@+id/nav_gallery"
