@@ -1,6 +1,7 @@
 package vinnik.facerecognizer.NavigationSection;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,9 +11,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import vinnik.facerecognizer.R;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,6 +26,7 @@ import vinnik.facerecognizer.R;
 public class HomePageFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
+    SharedPreferences sPref;
 
     public HomePageFragment() {
         // Required empty public constructor
@@ -45,13 +47,18 @@ public class HomePageFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-
-        Button saveServerUrlButton = (Button) getActivity().findViewById(R.id.server_url_save_button);
-        final EditText ServerUrl = (EditText) getActivity().findViewById(R.id.server_url_edit_text);
-        saveServerUrlButton.setOnClickListener(new View.OnClickListener() {
+        sPref = getActivity().getPreferences(MODE_PRIVATE);
+        final EditText editText = (EditText) getActivity().findViewById(R.id.url);
+        editText.setText(sPref.getString("Url", "Введите Url"));
+        final Button saveText = (Button) getActivity().findViewById(R.id.save_button);
+        saveText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainActivity.retrofit = new Retrofit.Builder().baseUrl(String.valueOf(ServerUrl.getText())).addConverterFactory(GsonConverterFactory.create()).build();
+                String s = editText.getText().toString();
+                SharedPreferences.Editor ed = sPref.edit();
+                ed.putString("Url", s);
+                ed.commit();
+                MainActivity.RefreshUrl();
             }
         });
     }

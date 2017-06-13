@@ -24,6 +24,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import vinnik.facerecognizer.R;
 
+import static Support.HelpClass.UpdateNeeded;
+
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -43,6 +45,7 @@ public class FaceDetailFragment extends Fragment {
     private Button SaveButton;
     private Button BackButton;
     private Button DeleteButton;
+    private Button AllPhotoButton;
     private static final String ARG_PARAM1 = "param1";
 
     private OnFragmentInteractionListener mListener;
@@ -100,6 +103,7 @@ public class FaceDetailFragment extends Fragment {
         SaveButton = (Button) getActivity().findViewById(R.id.face_detail_save_button);
         BackButton = (Button) getActivity().findViewById(R.id.face_detail_back_button);
         DeleteButton = (Button) getActivity().findViewById(R.id.face_detail_delete_button);
+        AllPhotoButton = (Button) getActivity().findViewById(R.id.face_detail_show_all_photos);
         Face = (ImageView) getActivity().findViewById(R.id.face_detail_face);
         FirstName = (EditText) getActivity().findViewById(R.id.face_detail_first_name);
         MiddleName = (EditText) getActivity().findViewById(R.id.face_detail_middle_name);
@@ -114,25 +118,59 @@ public class FaceDetailFragment extends Fragment {
         SaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
                 person.FirstName = FirstName.getText().toString();
                 person.MiddleName = MiddleName.getText().toString();
                 person.LastName = LastName.getText().toString();
                 person.ShortName = ShortName.getText().toString();
                 person.City = City.getText().toString();
 
-                MainActivity.service.UpdatePerson(person).enqueue(new Callback<String>() {
-                    @Override
-                    public void onResponse(Call<String> call, Response<String> response) {
-                        Toast.makeText(getContext(), "Updated", Toast.LENGTH_SHORT).show();
-                        MainActivity.BackNavigate();
-                    }
+                if (person.Id != 0) {
+                    MainActivity.service.UpdatePerson(person).enqueue(new Callback<String>() {
+                        @Override
+                        public void onResponse(Call<String> call, Response<String> response) {
+                            Toast.makeText(getContext(), "Updated", Toast.LENGTH_SHORT).show();
+                            NamedPhoto foo = new NamedPhoto();
+                            foo.id = person.Id;
+                            int i = HelpClass.personList.indexOf(foo);
+                            foo = HelpClass.personList.get(i);
+                            foo.name = person.toString();
+                            HelpClass.personList.set(i, foo);
+                            MainActivity.BackNavigate();
+                        }
 
-                    @Override
-                    public void onFailure(Call<String> call, Throwable t) {
-                        Toast.makeText(getContext(), "ВСЕ ПРОПАЛО!", Toast.LENGTH_SHORT).show();
-                        MainActivity.BackNavigate();
-                    }
-                });
+                        @Override
+                        public void onFailure(Call<String> call, Throwable t) {
+                            Toast.makeText(getContext(), "ВСЕ ПРОПАЛО!", Toast.LENGTH_SHORT).show();
+                            MainActivity.BackNavigate();
+                        }
+                    });
+                }
+//                else{
+//                    File file = new File(person.LocalImageFile);
+//                    RequestBody requestFile = RequestBody.create(MediaType.parse("data:image/jpg;base64"), file);
+//                    // MultipartBody.Part is used to send also the actual file name
+//                    MultipartBody.Part body = MultipartBody.Part.createFormData("photo", "", requestFile);
+//
+//                    String descriptionString = person.toString();
+//                    RequestBody description =
+//                            RequestBody.create(
+//                                    okhttp3.MultipartBody.FORM, descriptionString);
+//                    MainActivity.service.addPhoto(description, body).enqueue(new Callback<String>() {
+//                        @Override
+//                        public void onResponse(Call<String> call, Response<String> response) {
+//                            Toast.makeText(getContext(), response.body(), Toast.LENGTH_SHORT).show();
+//                            UpdateNeeded = true;
+//                            MainActivity.Navigate(MainActivity.ListOfFragments.ListOfPeople, null);
+//                        }
+//
+//                        @Override
+//                        public void onFailure(Call<String> call, Throwable t) {
+//
+//                        }
+//                    });
+//                }
             }
         });
 
@@ -146,22 +184,30 @@ public class FaceDetailFragment extends Fragment {
         DeleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainActivity.service.DeletePerson(person).enqueue(new Callback<Person>() {
+                MainActivity.service.DeletePerson(person).enqueue(new Callback<String>() {
                     @Override
-                    public void onResponse(Call<Person> call, Response<Person> response) {
+                    public void onResponse(Call<String> call, Response<String> response) {
                         File f = new File(person.LocalImageFile);
                         f.delete();
                         NamedPhoto foo = new NamedPhoto();
                         foo.id = person.Id;
                         HelpClass.personList.remove(foo);
+                        UpdateNeeded = true;
                         MainActivity.BackNavigate();
                     }
 
                     @Override
-                    public void onFailure(Call<Person> call, Throwable t) {
+                    public void onFailure(Call<String> call, Throwable t) {
 
                     }
                 });
+            }
+        });
+
+        AllPhotoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MainActivity.Navigate(MainActivity.ListOfFragments.ListOfPersonPhotos, person.Id);
             }
         });
 

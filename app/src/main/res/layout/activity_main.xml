@@ -27,7 +27,9 @@
             android:id="@+id/content_contaiter"
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent">
+
+        </LinearLayout>
     </LinearLayout>
 
     <android.support.design.widget.NavigationView

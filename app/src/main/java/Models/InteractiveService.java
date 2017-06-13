@@ -20,8 +20,8 @@ import retrofit2.http.Query;
 
 public interface InteractiveService {
 
-    @GET("Photo/AllPhotoes")
-    Call<List<Photo>> allPhotoes();
+    @GET("Photo/AllPhotos")
+    Call<List<Photo>> allPhotos();
 
     @GET("Photo/AllPersons")
     Call<List<Person>> allPersons();
@@ -39,7 +39,7 @@ public interface InteractiveService {
             @Part("description") RequestBody description,
             @Part MultipartBody.Part photo);
     @Multipart
-    @POST("Photo/RecognizePhotoes")
+    @POST("Photo/RecognizePhotos")
     Call<List<Person>> Recognize(@Body File[] photo);
 
     @Multipart
@@ -47,12 +47,27 @@ public interface InteractiveService {
     Call<List<Person>> Recognize(@Part MultipartBody.Part photo);
 
     @POST("Photo/DeletePerson")
-    Call<Person> DeletePerson(@Body Person person);
+    Call<String> DeletePerson(@Body Person person);
 
     @POST("Photo/UpdatePerson")
     Call<String> UpdatePerson(@Body Person person);
 
     @GET("Photo/GetPersonDetail")
-    Call<Person> GetPersonDetail(@Query("id") int id);
+    Call<Person> GetPersonDetail(@Query("Id") int id);
+
+    @GET("Photo/GetPersonPhoto")
+    Call<ResponseBody> GetPersonPhoto(@Query("Id") int id);
+
+    @GET("Photo/GetPersonPhotoInfo")
+    Call<List<PhotoDetail>> GetPersonPhotoInfo(@Query("Id") int id);
+
+    @GET("Photo/MakeMainPhoto")
+    Call<String> MakeMainPhoto(@Query("Id") int id);
+
+    @GET("Photo/DeletePhoto")
+    Call<String> DeletePhoto(@Query("Id") int id);
+
+    @POST("Photo/ChangeOwner")
+    Call<String> ChangeOwner(@Query("Id") int id, @Query("shortName") String shortName);
 
 }

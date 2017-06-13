@@ -17,9 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Models.NamedPhoto;
+import Models.PhotoDetail;
 import Support.HelpClass;
 import Support.MyListOfPersonAdapter;
 import vinnik.facerecognizer.R;
+
+import static Support.HelpClass.currentStatus;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -60,6 +63,15 @@ public class ListOfPersonFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if (HelpClass.UpdateNeeded && HelpClass.currentStatus != HelpClass.CurrentStatus.NewPhotos) {
+            HelpClass.UpdateNeeded = false;
+            MainActivity.Navigate(MainActivity.ListOfFragments.ListOfPeople, null);
+        }
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         ListView listView = (ListView) getActivity().findViewById(R.id.list_of_person);
@@ -81,12 +93,26 @@ public class ListOfPersonFragment extends Fragment {
 
         ListAdapter listAdapter = new MyListOfPersonAdapter(getContext(), namedPhotos);
         listView.setAdapter(listAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                MainActivity.Navigate(MainActivity.ListOfFragments.FaceDetail, HelpClass.personList.get(position));
-            }
-        });
+        if (currentStatus == HelpClass.CurrentStatus.NewPhotos) {
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    PhotoDetail photoDetail = new PhotoDetail();
+                    photoDetail.Id = HelpClass.personList.get(position).id;
+                    photoDetail.ShortName = HelpClass.personList.get(position).name;
+                    photoDetail.Img = HelpClass.personList.get(position).filePath;
+                    MainActivity.Navigate(MainActivity.ListOfFragments.PhotoDetail, photoDetail);
+                }
+            });
+            //currentStatus = HelpClass.CurrentStatus.Neutral;
+        } else {
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    MainActivity.Navigate(MainActivity.ListOfFragments.FaceDetail, HelpClass.personList.get(position));
+                }
+            });
+        }
     }
 
 
