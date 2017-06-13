@@ -11,5 +11,5 @@ public class PhotoDetail implements Serializable {
     public int OwnerId;
     public String ShortName;
     public boolean IsTheBest;
-    public String Img;
+    public String Img; 
 }
