@@ -55,6 +55,9 @@ public interface InteractiveService {
     @GET("Photo/GetPersonDetail")
     Call<Person> GetPersonDetail(@Query("Id") int id);
 
+    @GET("Photo/GetPersonInfo")
+    Call<Person> GetPersonDetail(@Query("ShortName") String shortName);
+
     @GET("Photo/GetPersonPhoto")
     Call<ResponseBody> GetPersonPhoto(@Query("Id") int id);
 

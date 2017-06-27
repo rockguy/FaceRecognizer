@@ -24,7 +24,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import Models.NamedPhoto;
+import Models.PhotoDetail;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -262,7 +262,7 @@ public class HelpClass {
     }
 
 
-    public static List<NamedPhoto> personList;
+    public static List<PhotoDetail> personList;
 
     public enum CurrentStatus {NewPhotos, GalleryOfPeople, GalleryOfPerson, Neutral}
 

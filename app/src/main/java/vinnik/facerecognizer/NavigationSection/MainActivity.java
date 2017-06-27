@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import Models.InteractiveService;
-import Models.NamedPhoto;
 import Models.Person;
 import Models.PhotoDetail;
 import Support.HelpClass;
@@ -144,11 +143,12 @@ public class MainActivity extends FragmentActivity
             try {
                 List<Person> persons = (List<Person>) data.getSerializableExtra("Persons");
                 List<String> photos = (List<String>) data.getSerializableExtra("Photos");
-                List<NamedPhoto> namedPhoto = new ArrayList<>();
+                List<PhotoDetail> namedPhoto = new ArrayList<>();
                 for (int i = 0; i < persons.size(); i++) {
-                    NamedPhoto foo = new NamedPhoto();
-                    foo.id = persons.get(i).Id;
-                    foo.name = persons.get(i).toString();
+                    PhotoDetail foo = new PhotoDetail();
+                    foo.OwnerId = persons.get(i).Id;
+                    foo.LongName = persons.get(i).toString();
+                    foo.ShortName = persons.get(i).ShortName;
                     foo.filePath = photos.get(i);
                     namedPhoto.add(foo);
                 }
@@ -165,7 +165,7 @@ public class MainActivity extends FragmentActivity
         } else if (requestCode == ADD_PERSON && resultCode == RESULT_OK) {
             currentStatus = HelpClass.CurrentStatus.NewPhotos;
             PhotoDetail photoDetail = new PhotoDetail();
-            photoDetail.Img = data.getStringExtra("FaceData");
+            photoDetail.filePath = data.getStringExtra("FaceData");
             Navigate(ListOfFragments.PhotoDetail, photoDetail);
         } else if (requestCode == OPEN_IMAGE_FROM_GALLERY && resultCode == RESULT_OK) {
             Uri selectedImage = data.getData();
@@ -197,11 +197,12 @@ public class MainActivity extends FragmentActivity
             }
             List<Person> persons = (List<Person>) data0[1];
             List<String> photos = (List<String>) data0[0];
-            List<NamedPhoto> namedPhoto = new ArrayList<>();
+            List<PhotoDetail> namedPhoto = new ArrayList<>();
             for (int i = 0; i < persons.size(); i++) {
-                NamedPhoto foo = new NamedPhoto();
-                foo.id = persons.get(i).Id;
-                foo.name = persons.get(i).toString();
+                PhotoDetail foo = new PhotoDetail();
+                foo.OwnerId = persons.get(i).Id;
+                foo.LongName = persons.get(i).toString();
+                foo.ShortName = persons.get(i).ShortName;
                 foo.filePath = photos.get(i);
                 namedPhoto.add(foo);
             }
@@ -320,11 +321,12 @@ public class MainActivity extends FragmentActivity
                                                         if (files[0] == null) {
                                                             return null;
                                                         }
-                                                        List<NamedPhoto> namedPhoto = new ArrayList<>();
+                                                        List<PhotoDetail> namedPhoto = new ArrayList<>();
                                                         for (int i = 0; i < persons.size(); i++) {
-                                                            NamedPhoto foo = new NamedPhoto();
-                                                            foo.id = persons.get(i).Id;
-                                                            foo.name = persons.get(i).toString();
+                                                            PhotoDetail foo = new PhotoDetail();
+                                                            foo.OwnerId = persons.get(i).Id;
+                                                            foo.LongName = persons.get(i).toString();
+                                                            foo.ShortName = persons.get(i).ShortName;
                                                             foo.filePath = files[0].get(i);
                                                             namedPhoto.add(foo);
                                                         }
@@ -367,8 +369,8 @@ public class MainActivity extends FragmentActivity
                 break;
             }
             case FaceDetail:
-                final NamedPhoto p = (NamedPhoto) data;
-                MainActivity.service.GetPersonDetail(p.id).enqueue(new Callback<Person>() {
+                final PhotoDetail p = (PhotoDetail) data;
+                MainActivity.service.GetPersonDetail(p.OwnerId).enqueue(new Callback<Person>() {
                     @Override
                     public void onResponse(Call<Person> call, Response<Person> response) {
                         if (response.body() != null) {

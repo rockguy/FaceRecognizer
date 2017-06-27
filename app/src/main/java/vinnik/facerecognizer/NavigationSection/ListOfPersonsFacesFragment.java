@@ -112,7 +112,7 @@ public class ListOfPersonsFacesFragment extends Fragment {
         List<String> paths = (List<String>) f[0]; //getAllFileNames(path, currentImage, facesArray);
         photos = (List<PhotoDetail>) f[1];
         for (int i = 0; i < photos.size(); i++) {
-            photos.get(i).Img = paths.get(i);
+            photos.get(i).filePath = paths.get(i);
             /*photos.get(i).ShortName = ShortName;*/
         }
         gv.setAdapter(new PhotoAdapter(getContext(), photos));

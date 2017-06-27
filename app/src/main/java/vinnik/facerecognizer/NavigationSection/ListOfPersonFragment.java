@@ -16,7 +16,6 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
-import Models.NamedPhoto;
 import Models.PhotoDetail;
 import Support.HelpClass;
 import Support.MyListOfPersonAdapter;
@@ -35,6 +34,7 @@ import static Support.HelpClass.currentStatus;
 public class ListOfPersonFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
+    List<PhotoDetail> namedPhotos;
 
     public ListOfPersonFragment() {
         // Required empty public constructor
@@ -69,17 +69,15 @@ public class ListOfPersonFragment extends Fragment {
             HelpClass.UpdateNeeded = false;
             MainActivity.Navigate(MainActivity.ListOfFragments.ListOfPeople, null);
         }
+        refreshData();
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        ListView listView = (ListView) getActivity().findViewById(R.id.list_of_person);
-        List<NamedPhoto> namedPhotos = new ArrayList<>();
+    private void refreshData() {
+        namedPhotos = new ArrayList<>();
 
         for (int i = 0; i < HelpClass.personList.size(); i++) {
-            NamedPhoto foo = new NamedPhoto();
-            foo.name = HelpClass.personList.get(i).name;
+            PhotoDetail foo = new PhotoDetail();
+            foo.LongName = HelpClass.personList.get(i).LongName;
 
             if (!HelpClass.isNullOrEmpty(HelpClass.personList.get(i).filePath)) {
                 BitmapFactory.Options options = new BitmapFactory.Options();
@@ -90,18 +88,21 @@ public class ListOfPersonFragment extends Fragment {
             }
             namedPhotos.add(foo);
         }
+    }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        ListView listView = (ListView) getActivity().findViewById(R.id.list_of_person);
+
+        refreshData();
         ListAdapter listAdapter = new MyListOfPersonAdapter(getContext(), namedPhotos);
         listView.setAdapter(listAdapter);
         if (currentStatus == HelpClass.CurrentStatus.NewPhotos) {
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    PhotoDetail photoDetail = new PhotoDetail();
-                    photoDetail.Id = HelpClass.personList.get(position).id;
-                    photoDetail.ShortName = HelpClass.personList.get(position).name;
-                    photoDetail.Img = HelpClass.personList.get(position).filePath;
-                    MainActivity.Navigate(MainActivity.ListOfFragments.PhotoDetail, photoDetail);
+                    MainActivity.Navigate(MainActivity.ListOfFragments.PhotoDetail, HelpClass.personList.get(position));
                 }
             });
             //currentStatus = HelpClass.CurrentStatus.Neutral;

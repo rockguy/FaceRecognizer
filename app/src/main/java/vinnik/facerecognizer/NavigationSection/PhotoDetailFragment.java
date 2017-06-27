@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import java.io.File;
 
-import Models.NamedPhoto;
+import Models.Person;
 import Models.PhotoDetail;
 import Support.HelpClass;
 import okhttp3.MediaType;
@@ -29,6 +29,7 @@ import static Support.HelpClass.currentStatus;
 import static Support.HelpClass.personList;
 import static vinnik.facerecognizer.NavigationSection.MainActivity.BackNavigate;
 import static vinnik.facerecognizer.NavigationSection.MainActivity.Navigate;
+import static vinnik.facerecognizer.NavigationSection.MainActivity.context;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -82,7 +83,7 @@ public class PhotoDetailFragment extends Fragment {
     public void onStart() {
         super.onStart();
         ImageView imageView = (ImageView) getActivity().findViewById(R.id.image_item);
-        imageView.setImageBitmap(BitmapFactory.decodeFile(photoDetail.Img));
+        imageView.setImageBitmap(BitmapFactory.decodeFile(photoDetail.filePath));
 
         textView = (TextView) getActivity().findViewById(R.id.face_detail_short_name);
         textView.setText(ShortName);
@@ -158,12 +159,9 @@ public class PhotoDetailFragment extends Fragment {
                             @Override
                             public void onResponse(Call<String> call, Response<String> response) {
                                 if (currentStatus == HelpClass.CurrentStatus.NewPhotos) {
-                                    photoDetail.ShortName = textView.getText().toString();
-                                    NamedPhoto namedPhoto = new NamedPhoto();
-                                    namedPhoto.id = photoDetail.Id;
-                                    int i = HelpClass.personList.indexOf(namedPhoto);
-                                    namedPhoto = personList.get(i - 1);
-                                    namedPhoto.name = textView.getText().toString();
+                                    int i = HelpClass.personList.indexOf(photoDetail);
+                                    PhotoDetail namedPhoto = personList.get(i - 1);
+                                    namedPhoto.ShortName = textView.getText().toString();
                                     Navigate(MainActivity.ListOfFragments.ListOfNewPeople, null);
                                     return;
                                 }
@@ -176,7 +174,7 @@ public class PhotoDetailFragment extends Fragment {
                             }
                         });
                     } else {
-                        File file = new File(photoDetail.Img);
+                        File file = new File(photoDetail.filePath);
                         RequestBody requestFile = RequestBody.create(MediaType.parse("data:image/jpg;base64"), file);
                         // MultipartBody.Part is used to send also the actual file name
                         MultipartBody.Part body = MultipartBody.Part.createFormData("photo", "", requestFile);
@@ -190,20 +188,42 @@ public class PhotoDetailFragment extends Fragment {
                             public void onResponse(Call<String> call, Response<String> response) {
                                 Toast.makeText(getContext(), response.body(), Toast.LENGTH_SHORT).show();
                                 if (currentStatus == HelpClass.CurrentStatus.NewPhotos) {
-                                    photoDetail.ShortName = textView.getText().toString();
-                                    NamedPhoto namedPhoto = null;
-                                    for (NamedPhoto n : HelpClass.personList
+                                    final int i;
+                                    int i2 = 0;
+                                    for (PhotoDetail n : HelpClass.personList
                                             ) {
-                                        if (n.filePath.equals(photoDetail.Img)) {
-                                            namedPhoto = n;
+                                        if (n.filePath.equals(photoDetail.filePath)) {
+                                            break;
                                         }
+                                        i2++;
                                     }
-                                    namedPhoto.name = textView.getText().toString();
+                                    i = i2;
+                                    final int id;
                                     try {
-                                        namedPhoto.id = Integer.getInteger(response.body());
+                                        id = Integer.parseInt(response.body());
                                     } catch (Exception e) {
+                                        Toast.makeText(context, response.body(), Toast.LENGTH_SHORT);
+                                        return;
                                     }
-                                    Navigate(MainActivity.ListOfFragments.ListOfNewPeople, null);
+
+                                    MainActivity.service.GetPersonDetail(textView.getText().toString()).enqueue(new Callback<Person>() {
+                                        @Override
+                                        public void onResponse(Call<Person> call, Response<Person> response) {
+                                            PhotoDetail photoDetail = HelpClass.personList.get(i);
+                                            photoDetail.OwnerId = response.body().Id;
+                                            photoDetail.LongName = response.body().toString();
+                                            photoDetail.ShortName = response.body().ShortName;
+                                            photoDetail.Id = id;
+                                            Navigate(MainActivity.ListOfFragments.ListOfNewPeople, null);
+                                            return;
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<Person> call, Throwable t) {
+
+                                        }
+                                    });
+
                                     return;
                                 }
                                 UpdateNeeded = true;
@@ -224,16 +244,13 @@ public class PhotoDetailFragment extends Fragment {
             }
         });
 
-        if (currentStatus == HelpClass.CurrentStatus.NewPhotos) {
+        if (currentStatus == HelpClass.CurrentStatus.NewPhotos && photoDetail.Id == 0) {
             makeMainButton.setVisibility(View.GONE);
             deletePhotoButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (currentStatus == HelpClass.CurrentStatus.NewPhotos) {
-                        NamedPhoto namedPhoto = new NamedPhoto();
-                        namedPhoto.id = photoDetail.Id;
-                        int i = HelpClass.personList.indexOf(namedPhoto);
-                        HelpClass.personList.remove(namedPhoto);
+                        HelpClass.personList.remove(photoDetail);
                         Navigate(MainActivity.ListOfFragments.ListOfNewPeople, null);
                         return;
                     }
@@ -244,7 +261,7 @@ public class PhotoDetailFragment extends Fragment {
         toServer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                File file = new File(photoDetail.Img);
+                File file = new File(photoDetail.filePath);
                 RequestBody requestFile = RequestBody.create(MediaType.parse("data:image/jpg;base64"), file);
                 // MultipartBody.Part is used to send also the actual file name
                 MultipartBody.Part body = MultipartBody.Part.createFormData("photo", "", requestFile);

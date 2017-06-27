@@ -1,5 +1,7 @@
 package Models;
 
+import android.graphics.Bitmap;
+
 import java.io.Serializable;
 
 /**
@@ -10,6 +12,13 @@ public class PhotoDetail implements Serializable {
     public int Id;
     public int OwnerId;
     public String ShortName;
+    public String LongName;
     public boolean IsTheBest;
-    public String Img; 
+    public Bitmap bitmap;
+    public String filePath;
+
+    @Override
+    public boolean equals(Object obj) {
+        return Id == ((PhotoDetail) obj).Id;
+    }
 }

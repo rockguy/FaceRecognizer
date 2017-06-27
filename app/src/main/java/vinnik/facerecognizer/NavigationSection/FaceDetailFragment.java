@@ -16,8 +16,8 @@ import android.widget.Toast;
 
 import java.io.File;
 
-import Models.NamedPhoto;
 import Models.Person;
+import Models.PhotoDetail;
 import Support.HelpClass;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -131,11 +131,12 @@ public class FaceDetailFragment extends Fragment {
                         @Override
                         public void onResponse(Call<String> call, Response<String> response) {
                             Toast.makeText(getContext(), "Updated", Toast.LENGTH_SHORT).show();
-                            NamedPhoto foo = new NamedPhoto();
-                            foo.id = person.Id;
+                            PhotoDetail foo = new PhotoDetail();
+                            foo.OwnerId = person.Id;
                             int i = HelpClass.personList.indexOf(foo);
                             foo = HelpClass.personList.get(i);
-                            foo.name = person.toString();
+                            foo.LongName = person.toString();
+                            foo.ShortName = person.ShortName;
                             HelpClass.personList.set(i, foo);
                             MainActivity.BackNavigate();
                         }
@@ -189,8 +190,8 @@ public class FaceDetailFragment extends Fragment {
                     public void onResponse(Call<String> call, Response<String> response) {
                         File f = new File(person.LocalImageFile);
                         f.delete();
-                        NamedPhoto foo = new NamedPhoto();
-                        foo.id = person.Id;
+                        PhotoDetail foo = new PhotoDetail();
+                        foo.Id = person.Id;
                         HelpClass.personList.remove(foo);
                         UpdateNeeded = true;
                         MainActivity.BackNavigate();

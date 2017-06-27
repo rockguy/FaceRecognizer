@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import Models.NamedPhoto;
+import Models.PhotoDetail;
 import vinnik.facerecognizer.R;
 
 /**
@@ -26,9 +26,9 @@ import vinnik.facerecognizer.R;
 public class MyListOfPersonAdapter extends BaseAdapter {
     Context context;
     LayoutInflater mInflater;
-    List<NamedPhoto> namedPhotos;
+    List<PhotoDetail> namedPhotos;
 
-    public MyListOfPersonAdapter(Context context, List<NamedPhoto> namedPhotos) {
+    public MyListOfPersonAdapter(Context context, List<PhotoDetail> namedPhotos) {
         this.context = context;
         this.namedPhotos = namedPhotos;
         mInflater = LayoutInflater.from(context);
@@ -57,7 +57,7 @@ public class MyListOfPersonAdapter extends BaseAdapter {
         }
 
         final TextView tv = (TextView) root.findViewById(R.id.best_face_owner);
-        tv.setText(namedPhotos.get(position).name);
+        tv.setText(namedPhotos.get(position).LongName);
 
         final ImageView image = (ImageView) root.findViewById(R.id.best_face_image);
 

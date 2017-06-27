@@ -54,7 +54,7 @@ public class PhotoAdapter extends BaseAdapter {
         tv.setText(Integer.toString(i + 1));
 
         final ImageView image = (ImageView) root.findViewById(R.id.image_item);
-        image.setImageBitmap(BitmapFactory.decodeFile(photoDetails.get(i).Img));
+        image.setImageBitmap(BitmapFactory.decodeFile(photoDetails.get(i).filePath));
         return root;
     }
 }
